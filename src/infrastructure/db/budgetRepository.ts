@@ -6,8 +6,8 @@
 
 import type { Budget, NewBudgetInput } from '@/core/types/models';
 import type { BudgetRepository } from '@/core/ports/repositories';
-import { getDatabase } from '../database';
-import { newId, now } from '../mappers';
+import { getDatabase } from './database';
+import { newId, now } from './mappers';
 
 interface BudgetRow {
   id: string;

@@ -4,8 +4,8 @@
 
 import type { NewScannedTicketInput, ScannedTicket } from '@/core/types/models';
 import type { ScannedTicketRepository } from '@/core/ports/repositories';
-import { getDatabase } from '../database';
-import { newId, now } from '../mappers';
+import { getDatabase } from './database';
+import { newId, now } from './mappers';
 
 interface TicketRow {
   id: string;

@@ -10,8 +10,8 @@ import type {
   NewExpenseInput,
 } from '@/core/types/models';
 import type { ExpenseRepository } from '@/core/ports/repositories';
-import { getDatabase } from '../database';
-import { escapeLike, monthRange, newId, now } from '../mappers';
+import { getDatabase } from './database';
+import { escapeLike, monthRange, newId, now } from './mappers';
 
 interface ExpenseRow {
   id: string;

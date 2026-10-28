@@ -19,6 +19,10 @@ import {
   createSqliteScannedTicketRepository,
   createSqliteUserRepository,
 } from '@/infrastructure/db';
+import { hashPassword, verifyPassword } from '@/infrastructure/secure/passwordHasher';
+import { secureSessionStore } from '@/infrastructure/secure/sessionStore';
+import { newId as uuid, now as epochNow } from '@/infrastructure/db/mappers';
+import { createAuthService } from './authService';
 
 let repositories: Repositories | null = null;
 
@@ -34,6 +38,15 @@ export function getRepositories(): Repositories {
   }
   return repositories;
 }
+
+/** authService câblé avec les adapters locaux (hasher expo-crypto + SecureStore). */
+export const authService = createAuthService({
+  users: getRepositories().users,
+  hasher: { hash: hashPassword, verify: verifyPassword },
+  sessionStore: secureSessionStore,
+  newId: uuid,
+  now: epochNow,
+});
 
 /** Réinitialise le graphe (tests / logout destructif / changement de backend). */
 export function resetContainer(): void {

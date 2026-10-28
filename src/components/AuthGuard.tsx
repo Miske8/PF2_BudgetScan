@@ -5,13 +5,10 @@ import { Loader } from '@/components/ui';
 import { useAuthStatus } from '@/hooks/useAuthContext';
 
 /**
- * Guard de navigation (Étape 4).
+ * Guard de navigation (Étape 4, branché sur l'auth réelle à l'étape 6).
  * - status 'loading'   → splash locale (Loader) le temps de lire la session.
  * - status 'signed-out'→ redirection vers /login.
  * - status 'signed-in' → rend les children.
- *
- * À l'étape 6, `useAuthStatus` sera branché sur le authService réel
- * (SecureStore + SQLite) sans modifier ce composant.
  */
 export function AuthGuard({ children }: { children: React.ReactNode }) {
   const status = useAuthStatus();

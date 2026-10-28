@@ -1,13 +1,22 @@
 import { Redirect } from 'expo-router';
 import React from 'react';
+import { useAuthContext } from '@/hooks/useAuthContext';
+import { Loader } from '@/components/ui';
 
 /**
- * Route d'index (étape 4) : redirige vers l'onboarding.
- * À l'étape 6, logique affinée via le contexte auth :
- * - session valide → /(app)/(tabs)/dashboard
- * - onboarding déjà vu → /(auth)/login
- * - sinon → /onboarding
+ * Route d'index (étape 6 — routing conditionnel branché sur l'auth réelle) :
+ * - session valide          → dashboard
+ * - onboarding déjà vu      → login
+ * - sinon                   → onboarding
  */
 export default function Index() {
-  return <Redirect href="/onboarding" />;
+  const { status, onboardingSeen } = useAuthContext();
+
+  if (status === 'loading') {
+    return <Loader text="Chargement…" />;
+  }
+  if (status === 'signed-in') {
+    return <Redirect href="/(app)/(tabs)/dashboard" />;
+  }
+  return <Redirect href={onboardingSeen ? '/(auth)/login' : '/onboarding'} />;
 }

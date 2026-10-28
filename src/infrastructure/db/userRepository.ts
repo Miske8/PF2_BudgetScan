@@ -4,7 +4,7 @@
 
 import type { User } from '@/core/types/models';
 import type { UserRepository } from '@/core/ports/repositories';
-import { getDatabase } from '../database';
+import { getDatabase } from './database';
 
 interface UserRow {
   id: string;
