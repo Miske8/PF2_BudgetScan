@@ -1,19 +1,28 @@
 import { Stack } from 'expo-router';
 import React from 'react';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { theme } from '@/theme';
 
 /**
- * Racine Expo Router (Étape 3).
- * - Providers globaux : gestures + safe area.
- * - Thème appliqué aux écrans (fond surface).
- * L'auth guard et les onglets arriveront aux étapes 4 et 6.
+ * Racine Expo Router (étape 4 — navigation complète).
+ *
+ * Arborescence :
+ * - index            → redirect /onboarding
+ * - onboarding       → public
+ * - (auth)           → login, register (publics)
+ * - (app)            → protégé par AuthGuard :
+ *     - (tabs)       → dashboard, expenses, scan, budgets, stats
+ *     - expenses/*   → new, [id] (modal)
+ *     - tickets/*    → analyze (modal)
+ *     - categories, settings
  */
 export default function RootLayout() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
+        <StatusBar style="dark" />
         <Stack
           screenOptions={{
             headerShown: false,
@@ -21,6 +30,10 @@ export default function RootLayout() {
           }}
         >
           <Stack.Screen name="index" />
+          <Stack.Screen name="onboarding" />
+          <Stack.Screen name="(auth)" />
+          <Stack.Screen name="(app)" />
+          {/* Galerie design system — retirée à la finalisation (étape 12) */}
           <Stack.Screen name="gallery" options={{ title: 'Design System' }} />
         </Stack>
       </SafeAreaProvider>
