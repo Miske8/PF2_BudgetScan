@@ -1,0 +1,59 @@
+{
+  "expo": {
+    "name": "BudgetScan",
+    "slug": "budgetscan",
+    "version": "0.1.0",
+    "scheme": "budgetscan",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0B1220"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.budgetscan.app",
+      "infoPlist": {
+        "NSCameraUsageDescription": "BudgetScan utilise la caméra pour photographier vos tickets de caisse.",
+        "NSPhotoLibraryUsageDescription": "BudgetScan peut importer un ticket depuis votre galerie."
+      }
+    },
+    "android": {
+      "package": "com.budgetscan.app",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#0B1220"
+      },
+      "edgeToEdgeEnabled": true,
+      "predictiveBackGestureEnabled": false,
+      "permissions": ["android.permission.CAMERA"]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-sqlite",
+      "expo-secure-store",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "BudgetScan utilise la caméra pour photographier vos tickets de caisse."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "BudgetScan peut importer un ticket depuis votre galerie."
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
