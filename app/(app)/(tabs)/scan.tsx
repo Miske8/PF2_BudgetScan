@@ -25,7 +25,20 @@ import { useTicketScan } from '@/hooks/useTicketScan';
 
 export default function ScanScreen() {
   const router = useRouter();
-  const scan = useTicketScan();
+  // Déstructuration explicite : le compilateur React (via eslint-plugin-react-hooks)
+  // ne peut pas prouver la stabilité des valeurs retournées par un hook custom,
+  // ce qui générerait de faux positifs "refs during render" sur `scan.*`.
+  const {
+    phase: scanPhase,
+    analysis: scanAnalysis,
+    errorMessage: scanErrorMessage,
+    takePhoto,
+    pickFromGallery,
+    retry,
+    reset,
+    cameraRefCallback,
+    requestCameraPermission,
+  } = useTicketScan();
   const [permission] = useCameraPermissions();
   const engine = ticketService.describeEngine();
 
@@ -39,7 +52,7 @@ export default function ScanScreen() {
           title="Accès caméra refusé"
           message="BudgetScan ne peut pas ouvrir l’appareil photo. Vous pouvez importer une photo depuis la galerie ou saisir la dépense manuellement."
           actionLabel="Importer depuis la galerie"
-          onAction={() => void scan.pickFromGallery()}
+          onAction={() => void pickFromGallery()}
         />
         <View style={styles.manualFallback}>
           <Button label="Saisir manuellement" variant="ghost" onPress={() => router.push('/expenses/new')} />
@@ -49,16 +62,16 @@ export default function ScanScreen() {
   }
 
   const goToAnalyze = () => {
-    if (!scan.analysis) return;
-    const ex = scan.analysis.extraction;
-    const params: Record<string, string> = { id: scan.analysis.ticketId };
+    if (!scanAnalysis) return;
+    const ex = scanAnalysis.extraction;
+    const params: Record<string, string> = { id: scanAnalysis.ticketId };
     if (ex?.amount != null) params.amount = String(ex.amount);
     if (ex?.date != null && toFrDate(ex.date)) params.date = toFrDate(ex.date) as string;
     if (ex?.merchant) params.title = ex.merchant;
     router.push({ pathname: '/tickets/analyze', params });
   };
 
-  const analyzing = scan.phase === 'analyzing' || scan.phase === 'capturing';
+  const analyzing = scanPhase === 'analyzing' || scanPhase === 'capturing';
 
   return (
     <View style={styles.container}>
@@ -76,7 +89,7 @@ export default function ScanScreen() {
       <View style={styles.cameraArea}>
         {permission?.granted ? (
           <CameraView
-            ref={scan.cameraRefCallback}
+            ref={cameraRefCallback}
             style={StyleSheet.absoluteFill}
             facing="back"
             mode="picture"
@@ -88,7 +101,7 @@ export default function ScanScreen() {
               {permission === null ? 'Préparation de la caméra…' : 'Autorisez l’accès à la caméra pour scanner vos tickets.'}
             </Text>
             {permission && !permission.granted ? (
-              <Button label="Activer la caméra" onPress={() => void scan.requestCameraPermission()} testID="scan-ask-permission" />
+              <Button label="Activer la caméra" onPress={() => void requestCameraPermission()} testID="scan-ask-permission" />
             ) : null}
           </View>
         )}
@@ -110,7 +123,7 @@ export default function ScanScreen() {
             <Card style={styles.analyzingChip}>
               <ActivityIndicator color={theme.colors.primary} />
               <Text style={styles.analyzingText}>
-                {scan.phase === 'capturing' ? 'Capture…' : 'Analyse du ticket…'}
+                {scanPhase === 'capturing' ? 'Capture…' : 'Analyse du ticket…'}
               </Text>
             </Card>
           </View>
@@ -119,18 +132,18 @@ export default function ScanScreen() {
 
       {/* Zone d'action basse */}
       <View style={styles.controls}>
-        {scan.phase === 'done' && scan.analysis ? (
-          <DoneSummary analysis={scan.analysis} onConfirm={goToAnalyze} onDiscard={scan.reset} />
+        {scanPhase === 'done' && scanAnalysis ? (
+          <DoneSummary analysis={scanAnalysis} onConfirm={goToAnalyze} onDiscard={reset} />
         ) : (
           <>
             <Text style={styles.hint}>Cadrez le ticket entier, lumière naturelle recommandée.</Text>
             <View style={styles.actionRow}>
-              <IconButton name="images-outline" label="Galerie" onPress={() => void scan.pickFromGallery()} />
+              <IconButton name="images-outline" label="Galerie" onPress={() => void pickFromGallery()} />
               <Pressable
                 accessibilityRole="button"
                 accessibilityLabel="Capturer le ticket"
                 testID="scan-capture"
-                onPress={() => void scan.takePhoto()}
+                onPress={() => void takePhoto()}
                 disabled={analyzing}
                 style={({ pressed }) => [
                   styles.shutter,
@@ -147,14 +160,14 @@ export default function ScanScreen() {
       </View>
 
       {/* Erreur d'analyse : modale avec réessai + replis */}
-      <Modal visible={scan.phase === 'error'} transparent animationType="fade" onRequestClose={scan.reset}>
+      <Modal visible={scanPhase === 'error'} transparent animationType="fade" onRequestClose={reset}>
         <View style={styles.modalBackdrop}>
           <Card style={styles.modalCard}>
             <Text style={styles.modalTitle}>Analyse impossible</Text>
-            <Text style={styles.modalMessage}>{scan.errorMessage}</Text>
-            <Button label="Réessayer l’analyse" onPress={() => void scan.retry()} testID="scan-retry" />
-            <Button label="Importer une autre photo" variant="secondary" onPress={() => void scan.pickFromGallery()} />
-            <Button label="Saisir manuellement" variant="ghost" onPress={scan.reset} />
+            <Text style={styles.modalMessage}>{scanErrorMessage}</Text>
+            <Button label="Réessayer l’analyse" onPress={() => void retry()} testID="scan-retry" />
+            <Button label="Importer une autre photo" variant="secondary" onPress={() => void pickFromGallery()} />
+            <Button label="Saisir manuellement" variant="ghost" onPress={reset} />
           </Card>
         </View>
       </Modal>

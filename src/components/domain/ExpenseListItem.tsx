@@ -7,8 +7,7 @@ import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import type { Category, Expense } from '@/core/types/models';
-import { formatCurrencyCompact, formatDate } from '@/theme';
-import { theme } from '@/theme';
+import { formatCurrencyCompact, formatDate , theme } from '@/theme';
 
 export interface ExpenseListItemProps {
   expense: Expense;

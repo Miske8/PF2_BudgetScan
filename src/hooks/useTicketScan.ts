@@ -9,7 +9,7 @@
  * Analyse : déléguée à ticketService → port OcrService (mock ou API).
  */
 
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { CameraView, useCameraPermissions, type CameraPictureOptions } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
 import { ImageManipulator, SaveFormat } from 'expo-image-manipulator';
@@ -59,15 +59,19 @@ export function useTicketScan(): UseTicketScanResult {
   const [phase, setPhase] = useState<ScanPhase>('idle');
   const [analysis, setAnalysis] = useState<TicketAnalysis | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const cameraRef = useRef<CameraView | null>(null);
-  /** Dernière image capturée — permet "Réessayer" sans repasser par la caméra. */
-  const lastImageUri = useRef<string | null>(null);
+  /**
+   * Refs stockées en state (React Compiler / règle `react-hooks/refs`) :
+   * la lecture de `ref.current` est interdite pendant le rendu, donc on
+   * conserve les valeurs accessibles au rendu dans un state.
+   */
+  const [cameraNode, setCameraNode] = useState<CameraView | null>(null);
+  const [lastImageUri, setLastImageUri] = useState<string | null>(null);
 
   const granted = permission?.granted ?? null;
 
   /** Référence à passer à <CameraView ref={...}> pour takePictureAsync. */
   const setCameraRef = useCallback((node: CameraView | null) => {
-    cameraRef.current = node;
+    setCameraNode(node);
   }, []);
 
   const requestCameraPermission = useCallback(async () => {
@@ -84,7 +88,7 @@ export function useTicketScan(): UseTicketScanResult {
         setPhase('error');
         return;
       }
-      lastImageUri.current = imageUri;
+      setLastImageUri(imageUri);
       setPhase('analyzing');
       setErrorMessage(null);
       const result = await ticketService.analyzeCapturedImage(user.id, imageUri);
@@ -100,10 +104,10 @@ export function useTicketScan(): UseTicketScanResult {
   );
 
   const takePhoto = useCallback(async () => {
-    if (!cameraRef.current || !user) return;
+    if (!cameraNode || !user) return;
     setPhase('capturing');
     try {
-      const picture = await cameraRef.current.takePictureAsync(CAPTURE_OPTIONS);
+      const picture = await cameraNode.takePictureAsync(CAPTURE_OPTIONS);
       if (!picture?.uri) throw new Error('CAPTURE_EMPTY');
       const normalized = await normalizeImage(picture.uri);
       await analyze(normalized);
@@ -111,7 +115,7 @@ export function useTicketScan(): UseTicketScanResult {
       setErrorMessage('Impossible de capturer l’image. Vérifiez la permission caméra et réessayez.');
       setPhase('error');
     }
-  }, [analyze, user]);
+  }, [analyze, cameraNode, user]);
 
   const pickFromGallery = useCallback(async () => {
     if (!user) return;
@@ -132,8 +136,8 @@ export function useTicketScan(): UseTicketScanResult {
   }, [analyze, user]);
 
   const retry = useCallback(async () => {
-    if (lastImageUri.current) await analyze(lastImageUri.current);
-  }, [analyze]);
+    if (lastImageUri) await analyze(lastImageUri);
+  }, [analyze, lastImageUri]);
 
   const reset = useCallback(() => {
     setPhase('idle');

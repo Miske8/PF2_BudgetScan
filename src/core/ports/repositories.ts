@@ -56,7 +56,7 @@ export interface ExpenseRepository {
   remove(id: string): Promise<void>;
   sumByCategory(userId: string, month: number, year: number): Promise<Record<string, number>>;
   sumTotal(userId: string, month: number, year: number): Promise<number>;
-  monthlyTotals(userId: string, lastMonths: number): Promise<Array<{ month: number; year: number; total: number }>>;
+  monthlyTotals(userId: string, lastMonths: number): Promise<{ month: number; year: number; total: number }[]>;
 }
 
 export interface ScannedTicketRepository {

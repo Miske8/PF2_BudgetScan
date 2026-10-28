@@ -12,8 +12,7 @@ import { ExpenseForm } from '@/components/domain/ExpenseForm';
 import { useAsync } from '@/hooks/useAsync';
 import { useExpenseForm } from '@/hooks/useExpenseForm';
 import { categoryService, expenseService } from '@/services';
-import { formatCurrency, formatDate } from '@/theme';
-import { theme } from '@/theme';
+import { formatCurrency, formatDate , theme } from '@/theme';
 
 export default function ExpenseDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();

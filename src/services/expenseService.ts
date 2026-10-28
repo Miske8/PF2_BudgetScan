@@ -28,7 +28,7 @@ export interface ExpenseService {
   monthlyTotals(
     userId: string,
     lastMonths: number,
-  ): Promise<Array<{ month: number; year: number; total: number }>>;
+  ): Promise<{ month: number; year: number; total: number }[]>;
 }
 
 export function createExpenseService(): ExpenseService {

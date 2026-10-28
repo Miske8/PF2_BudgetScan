@@ -187,7 +187,7 @@ export default function ExpensesScreen() {
 interface PickerFieldProps {
   value: string;
   onChange: (v: string) => void;
-  options: Array<{ key: string; label: string }>;
+  options: { key: string; label: string }[];
   testID?: string;
 }
 

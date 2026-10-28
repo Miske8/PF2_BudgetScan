@@ -19,12 +19,12 @@ export interface BudgetOverview {
   /** 0..1+ (ratio dépensé / budget global). */
   progress: number;
   overBudget: boolean;
-  byCategory: Array<{
+  byCategory: {
     budget: Budget;
     spent: number;
     remaining: number;
     progress: number;
-  }>;
+  }[];
 }
 
 export interface BudgetService {
