@@ -124,13 +124,13 @@ export default function StorageCheckScreen() {
       <Header title="Vérification stockage" />
       <ScrollView contentContainerStyle={styles.content}>
         <Card style={styles.card}>
-          <Text style={styles.title}>Tests d'intégration SQLite</Text>
+          <Text style={styles.title}>{'Tests d'intégration SQLite'}</Text>
           <Text style={styles.subtitle}>
             Migrations, seed, services, règles métier et persistance sont vérifiés sur
             l&apos;appareil. Cet écran est temporaire (retiré à l&apos;étape 12).
           </Text>
           <Button
-            title={running ? 'Analyse en cours…' : 'Lancer les vérifications'}
+            label={running ? 'Analyse en cours…' : 'Lancer les vérifications'}
             onPress={runChecks}
             disabled={running}
             testID="storage-check-run"
@@ -163,6 +163,6 @@ const styles = StyleSheet.create({
   subtitle: { ...theme.typography.caption, color: theme.colors.textMuted },
   logRow: { flexDirection: 'row', gap: theme.spacing.sm, alignItems: 'flex-start' },
   logBody: { flex: 1 },
-  logLabel: { ...theme.typography.footnote, color: theme.colors.text },
+  logLabel: { ...theme.typography.caption, color: theme.colors.text },
   logDetail: { ...theme.typography.caption, color: theme.colors.textFaint },
 });
