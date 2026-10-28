@@ -32,3 +32,15 @@ export interface OcrService {
    */
   extractFromImage(imageUri: string): Promise<OcrReceiptResult>;
 }
+
+/** Codes d'erreur normalisés communs à tous les moteurs OCR. */
+export type OcrErrorCode = 'NO_AMOUNT_FOUND' | 'IMAGE_UNREADABLE' | 'NETWORK' | 'TIMEOUT' | 'ABORTED';
+
+export class OcrError extends Error {
+  readonly code: OcrErrorCode;
+  constructor(code: OcrErrorCode, message: string) {
+    super(message);
+    this.name = 'OcrError';
+    this.code = code;
+  }
+}
