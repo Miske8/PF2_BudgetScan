@@ -1,4 +1,4 @@
-// ESLint flat config — Expo SDK 54 (eslint-config-expo v10+)
+// ESLint flat config — Expo SDK 54 (eslint-config-expo)
 const { defineConfig } = require('eslint/config');
 const expoConfig = require('eslint-config-expo/flat');
 
@@ -11,7 +11,7 @@ module.exports = defineConfig([
     rules: {
       // Règles strictes supplémentaires pour BudgetScan
       'no-console': ['warn', { allow: ['warn', 'error'] }],
-      'unused-imports/no-unused-vars': [
+      'no-unused-vars': [
         'warn',
         { args: 'after-used', argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
       ],

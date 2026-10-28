@@ -1,22 +1,25 @@
 /**
- * Thème BudgetScan — fondations (Étape 2).
- * La version complète (typographie, spacing, composants) arrive à l'étape 3.
+ * Thème BudgetScan — point d'entrée unique.
+ * Importer depuis '@/theme' partout dans l'app.
  */
-export const colors = {
-  primary: '#16A34A',
-  primaryDark: '#0E7A38',
-  background: '#F8FAFC',
-  surface: '#FFFFFF',
-  text: '#0B1220',
-  textMuted: '#64748B',
-  border: '#E2E8F0',
-  danger: '#DC2626',
-  warning: '#D97706',
-  success: '#16A34A',
+import { palette, categoryColors } from './colors';
+import { typography, fontSize, fontFamily, lineHeight } from './typography';
+import { spacing, radius, shadow, touchTarget } from './spacing';
+
+export const theme = {
+  colors: palette,
+  typography,
+  fontSize,
+  fontFamily,
+  lineHeight,
+  spacing,
+  radius,
+  shadow,
+  touchTarget,
 } as const;
 
-export type AppTheme = {
-  colors: typeof colors;
-};
+export type AppTheme = typeof theme;
 
-export const theme: AppTheme = { colors };
+export { palette, categoryColors };
+export * from './format';
+export default theme;
