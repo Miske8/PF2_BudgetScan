@@ -180,7 +180,7 @@ export function createSqliteExpenseRepository(): ExpenseRepository {
     async monthlyTotals(
       userId: string,
       lastMonths: number,
-    ): Promise<Array<{ month: number; year: number; total: number }>> {
+    ): Promise<{ month: number; year: number; total: number }[]> {
       const db = await getDatabase();
       // Agrégat par période locale via strftime sur date (epoch ms -> jours).
       const rows = await db.getAllAsync<{ m: number; y: number; total: number }>(

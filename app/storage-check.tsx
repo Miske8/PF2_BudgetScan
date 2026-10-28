@@ -124,7 +124,7 @@ export default function StorageCheckScreen() {
       <Header title="Vérification stockage" />
       <ScrollView contentContainerStyle={styles.content}>
         <Card style={styles.card}>
-          <Text style={styles.title}>Tests d'intégration SQLite</Text>
+          <Text style={styles.title}>{'Tests d\u2019int\u00e9gration SQLite'}</Text>
           <Text style={styles.subtitle}>
             Migrations, seed, services, règles métier et persistance sont vérifiés sur
             l&apos;appareil. Cet écran est temporaire (retiré à l&apos;étape 12).

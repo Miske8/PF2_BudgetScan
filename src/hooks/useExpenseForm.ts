@@ -50,6 +50,12 @@ export function useExpenseForm({ expense, initial }: UseExpenseFormOptions = {})
   }, [userId]);
   const categories = catsQuery.data ?? [];
 
+  /** Conversion stricte (sans Date.now()) : undefined si absent ou invalide. */
+  const initialDateMs = typeof initial?.date === 'number' && Number.isFinite(initial.date) ? initial.date : undefined;
+  // Valeur dérivée stable au rendu (la règle react-hooks/purity interdit
+  // Date.now() directement dans le composant).
+  const todayStart = new Date().setHours(0, 0, 0, 0);
+
   const defaultValues = useMemo<ExpenseFormInput>(
     () => ({
       title: expense?.title ?? initial?.title ?? '',
@@ -57,7 +63,7 @@ export function useExpenseForm({ expense, initial }: UseExpenseFormOptions = {})
         const raw = expense?.amount ?? (typeof initial?.amount === 'number' ? initial.amount : undefined);
         return raw === undefined ? '' : String(raw).replace('.', ',');
       })(),
-      date: toDateFr(expense?.date ?? (typeof initial?.date === 'number' ? initial.date : undefined) ?? Date.now()),
+      date: toDateFr(expense?.date ?? initialDateMs ?? todayStart),
       categoryId: expense?.categoryId ?? initial?.categoryId ?? '',
       note: expense?.note ?? initial?.note ?? '',
       receiptImageUri: expense?.receiptImageUri ?? initial?.receiptImageUri ?? null,
@@ -81,12 +87,11 @@ export function useExpenseForm({ expense, initial }: UseExpenseFormOptions = {})
 
   // Si les catégories arrivent après le montage et qu'aucune n'est choisie,
   // on ne force rien : le schéma Zod exigera une sélection explicite.
-  useEffect(() => {
-    if (!defaultValues.categoryId && categories.length === 0 && !catsQuery.loading) {
-      setSubmitError('Aucune catégorie disponible. Créez-en une depuis Réglages.');
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- exécution unique quand chargement terminé
-  }, [catsQuery.loading]);
+  // Message dérivé au rendu (pas de setState dans un effect — règle purity).
+  const noCategoriesError =
+    !defaultValues.categoryId && catsQuery.data !== undefined && catsQuery.data.length === 0
+      ? 'Aucune catégorie disponible. Créez-en une depuis Réglages.'
+      : null;
 
   const onSubmit = async (): Promise<boolean> => {
     if (!userId) {
@@ -95,6 +100,11 @@ export function useExpenseForm({ expense, initial }: UseExpenseFormOptions = {})
     }
     setSubmitting(true);
     setSubmitError(null);
+    if (noCategoriesError) {
+      setSubmitError(noCategoriesError);
+      setSubmitting(false);
+      return false;
+    }
     try {
       const valid = await form.trigger();
       if (!valid) return false;
