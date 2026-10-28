@@ -7,9 +7,9 @@ import type { AuthState, AuthStatus, SessionUser } from '@/core/types/auth';
  * À l'étape 6, il sera alimenté par le authService (SecureStore + SQLite).
  */
 export interface AuthContextValue extends AuthState {
-  signIn: (user: SessionUser) => Promise<void>;
+  signIn: (_user: SessionUser) => Promise<void>;
   signOut: () => Promise<void>;
-  setOnboardingSeen: (seen: boolean) => Promise<void>;
+  setOnboardingSeen: (_seen: boolean) => Promise<void>;
 }
 
 /** Préfixe `_` : signatures déclaratives, implémentées par le provider (étape 6). */
