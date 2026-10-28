@@ -14,7 +14,8 @@ export const categoryService = createCategoryService();
 export const budgetService = createBudgetService();
 export const statsService = createStatsService();
 
-export { getRepositories, resetContainer } from './container';
+export { getRepositories, resetContainer, authService } from './container';
+export type { AuthService } from './authService';
 export type { BudgetOverview } from './budgetService';
 export type { CategoryBreakdownItem, MonthlyTrendPoint } from './statsService';
 export { SELECTABLE_ICONS } from './categoryService';

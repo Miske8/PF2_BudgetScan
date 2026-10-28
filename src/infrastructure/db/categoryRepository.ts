@@ -4,8 +4,8 @@
 
 import type { Category, CategoryIconName, NewCategoryInput } from '@/core/types/models';
 import type { CategoryRepository } from '@/core/ports/repositories';
-import { getDatabase } from '../database';
-import { fromBool, newId, now, required, toBool } from '../mappers';
+import { getDatabase } from './database';
+import { fromBool, newId, now, required, toBool } from './mappers';
 
 interface CategoryRow {
   id: string;

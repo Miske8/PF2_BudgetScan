@@ -15,26 +15,10 @@
 import { getDatabase } from '../database';
 import { newId, now } from '../mappers';
 import { seedDefaultCategories } from './defaultCategories';
+import { hashPassword } from '../../secure/passwordHasher';
 
 export const DEMO_EMAIL = 'demo@budgetscan.app';
 export const DEMO_PASSWORD = 'demo1234';
-
-/**
- * Hash déterministe sans dépendance native : FNV-1a 64 bits (en 2×32 bits)
- * + sel. Suffisant pour une auth STRICTEMENT locale du MVP ; remplacé par
- * sha256 (expo-crypto) à l'étape 6 — la colonne password_hash reste opaque.
- */
-export function hashPasswordLocal(password: string): string {
-  const input = `budgetscan:v1:${password}`;
-  let h1 = 0x811c9dc5;
-  let h2 = 0x01000193;
-  for (let i = 0; i < input.length; i += 1) {
-    const c = input.charCodeAt(i);
-    h1 = Math.imul(h1 ^ c, 0x01000193) >>> 0;
-    h2 = Math.imul((h2 + c) ^ (h2 >>> 7), 0x85ebca6b) >>> 0;
-  }
-  return `${h1.toString(16).padStart(8, '0')}${h2.toString(16).padStart(8, '0')}`;
-}
 
 interface DemoExpenseTemplate {
   title: string;
@@ -75,7 +59,9 @@ export async function seedDemoData(): Promise<{ userId: string }> {
 
   const userId = newId();
   const timestamp = now();
-  const passwordHash = hashPasswordLocal(DEMO_PASSWORD);
+  // Étape 6 : le compte démo utilise le MÊME hasher que les vrais comptes
+  // (sha256 itéré + sel) — il est donc connectable via l'écran Login.
+  const passwordHash = await hashPassword(DEMO_PASSWORD);
 
   await db.runAsync(
     `INSERT INTO users (id, name, email, password_hash, created_at) VALUES (?, ?, ?, ?, ?)`,

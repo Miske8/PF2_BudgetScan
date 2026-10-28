@@ -4,10 +4,11 @@ import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Button } from '@/components/ui';
+import { useAuthContext } from '@/hooks/useAuthContext';
 import { theme } from '@/theme';
 
 /**
- * Onboarding — écran d'accueil public (étape 6 : skip si déjà vu).
+ * Onboarding — écran d'accueil public (étape 6 : mémorise "vu" via prefs).
  * Slide unique MVP : valeur de l'app + CTA.
  */
 const FEATURES = [
@@ -17,6 +18,14 @@ const FEATURES = [
 ] as const;
 
 export default function OnboardingScreen() {
+  const { setOnboardingSeen } = useAuthContext();
+
+  /** Mémorise "onboarding vu" puis navigue (l'index redirigera directement ici la prochaine fois). */
+  const goNext = (href: '/(auth)/register' | '/(auth)/login') => {
+    void setOnboardingSeen(true);
+    router.push(href);
+  };
+
   return (
     <SafeAreaView style={styles.safe}>
       <ScrollView contentContainerStyle={styles.container}>
@@ -49,14 +58,14 @@ export default function OnboardingScreen() {
           label="Commencer"
           size="lg"
           fullWidth
-          onPress={() => router.push('/(auth)/register')}
+          onPress={() => goNext('/(auth)/register')}
           testID="onboarding-start"
         />
         <Button
           label="J'ai déjà un compte"
           variant="ghost"
           fullWidth
-          onPress={() => router.push('/(auth)/login')}
+          onPress={() => goNext('/(auth)/login')}
           testID="onboarding-login"
         />
       </View>
