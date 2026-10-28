@@ -22,6 +22,9 @@ import {
 import { hashPassword, verifyPassword } from '@/infrastructure/secure/passwordHasher';
 import { secureSessionStore } from '@/infrastructure/secure/sessionStore';
 import { newId as uuid, now as epochNow } from '@/infrastructure/db/mappers';
+import type { OcrService } from '@/core/ports/ocr';
+import { createMockOcrService } from '@/infrastructure/ocr/mockOcrService';
+import { createRemoteOcrService } from '@/infrastructure/ocr/remoteOcrService';
 import { createAuthService } from './authService';
 
 let repositories: Repositories | null = null;
@@ -48,7 +51,32 @@ export const authService = createAuthService({
   now: epochNow,
 });
 
+// ---------------------------------------------------------------------------
+// OCR — résolu à partir des variables d'environnement publiques.
+// EXPO_PUBLIC_OCR_API_URL vide  → MockOcrService (simulation, hors ligne).
+// EXPO_PUBLIC_OCR_API_URL rempli → RemoteOcrService (future API cloud).
+// ---------------------------------------------------------------------------
+
+let ocrService: OcrService | null = null;
+
+export function resolveOcrService(): OcrService {
+  if (!ocrService) {
+    const apiUrl = process.env.EXPO_PUBLIC_OCR_API_URL?.trim();
+    const apiKey = process.env.EXPO_PUBLIC_OCR_API_KEY?.trim();
+    ocrService = apiUrl
+      ? createRemoteOcrService({ baseUrl: apiUrl, apiKey: apiKey || undefined })
+      : createMockOcrService();
+  }
+  return ocrService;
+}
+
+/** Forcer un moteur (tests, settings dev). Passer `null` → re-résolution via .env. */
+export function setOcrService(service: OcrService | null): void {
+  ocrService = service;
+}
+
 /** Réinitialise le graphe (tests / logout destructif / changement de backend). */
 export function resetContainer(): void {
   repositories = null;
+  ocrService = null;
 }
